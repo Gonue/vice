@@ -1,4 +1,4 @@
-package com.example.demo.domain.dto.Request;
+package com.example.demo.domain.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
@@ -7,10 +7,11 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
 
 @Getter
 @AllArgsConstructor
-public class GalleryCreationRequest {
+public class GalleryUpdateDto {
 
     @Schema(description = "갤러리 타입 ID", example = "17")
     @NotBlank(message = "갤러리 타입 ID는 필수 항목입니다.")
@@ -40,4 +41,7 @@ public class GalleryCreationRequest {
     @Schema(description = "검색키워드", example = "영도대교, 부산광역시 영도구, 다리, 9월 추천여행지")
     @Size(max = 255, message = "검색 키워드는 255자를 넘을 수 없습니다.")
     private String galSearchKeyword;
+
+    @Schema(hidden = true)
+    private LocalDateTime galModifiedTime;
 }
