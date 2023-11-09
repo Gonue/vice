@@ -1,4 +1,4 @@
-package com.example.demo.domain.dto.Response;
+package com.example.demo.domain.dto;
 
 import com.example.demo.domain.entity.Gallery;
 import lombok.Getter;

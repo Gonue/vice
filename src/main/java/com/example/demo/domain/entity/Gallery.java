@@ -1,18 +1,13 @@
 package com.example.demo.domain.entity;
 
-import com.example.demo.domain.dto.Request.GalleryCreationRequest;
-import com.example.demo.domain.dto.Response.TourismPhotoGalleryResponseDto;
-import com.example.demo.global.utils.DateTimeUtil;
+import com.example.demo.domain.dto.GalleryUpdateDto;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-@Builder
 @Table(name = "gallery")
 @Entity
 public class Gallery {
@@ -50,41 +45,31 @@ public class Gallery {
     @Column(name = "search_keyword", nullable = false)
     private String galSearchKeyword;
 
-    public static Gallery of(GalleryCreationRequest request) {
-        String galContentId = "c" + UUID.randomUUID().toString();
-
-        return Gallery.builder()
-                .galContentId(galContentId)
-                .galContentTypeId(request.getGalContentTypeId())
-                .galTitle(request.getGalTitle())
-                .galWebImageUrl(request.getGalWebImageUrl())
-                .galPhotographer(request.getGalPhotographer())
-                .galPhotographyLocation(request.getGalPhotographyLocation())
-                .galPhotographyMonth(request.getGalPhotographyMonth())
-                .galSearchKeyword(request.getGalSearchKeyword())
-                .build();
+    @Builder
+    public Gallery(String galContentId, String galContentTypeId, String galTitle, String galWebImageUrl,
+                   String galPhotographyMonth, String galPhotographyLocation, String galPhotographer,
+                   String galSearchKeyword, LocalDateTime galCreatedtime, LocalDateTime galModifiedtime) {
+        this.galContentId = galContentId;
+        this.galContentTypeId = galContentTypeId;
+        this.galTitle = galTitle;
+        this.galWebImageUrl = galWebImageUrl;
+        this.galPhotographyMonth = galPhotographyMonth;
+        this.galPhotographyLocation = galPhotographyLocation;
+        this.galPhotographer = galPhotographer;
+        this.galSearchKeyword = galSearchKeyword;
+        this.galCreatedtime = galCreatedtime;
+        this.galModifiedtime = galModifiedtime;
     }
 
-    public void update(GalleryCreationRequest request) {
-        this.galContentTypeId = request.getGalContentTypeId();
-        this.galTitle = request.getGalTitle();
-        this.galWebImageUrl = request.getGalWebImageUrl();
-        this.galPhotographer = request.getGalPhotographer();
-        this.galPhotographyLocation = request.getGalPhotographyLocation();
-        this.galPhotographyMonth = request.getGalPhotographyMonth();
-        this.galSearchKeyword = request.getGalSearchKeyword();
-        this.galModifiedtime = LocalDateTime.now();
-    }
-    public void updateFromDto(TourismPhotoGalleryResponseDto.GalleryItem dto) {
-        this.galContentTypeId = dto.getGalContentTypeId();
-        this.galTitle = dto.getGalTitle();
-        this.galWebImageUrl = dto.getGalWebImageUrl();
-        this.galCreatedtime = DateTimeUtil.parseToLocalDateTime(dto.getGalCreatedtime());
-        this.galModifiedtime = DateTimeUtil.parseToLocalDateTime(dto.getGalModifiedtime());
-        this.galPhotographyMonth = dto.getGalPhotographyMonth();
-        this.galPhotographyLocation = dto.getGalPhotographyLocation();
-        this.galPhotographer = dto.getGalPhotographer();
-        this.galSearchKeyword = dto.getGalSearchKeyword();
+    public void update(GalleryUpdateDto updateDto) {
+        this.galContentTypeId = updateDto.getGalContentTypeId();
+        this.galTitle = updateDto.getGalTitle();
+        this.galWebImageUrl = updateDto.getGalWebImageUrl();
+        this.galPhotographyMonth = updateDto.getGalPhotographyMonth();
+        this.galPhotographyLocation = updateDto.getGalPhotographyLocation();
+        this.galPhotographer = updateDto.getGalPhotographer();
+        this.galSearchKeyword = updateDto.getGalSearchKeyword();
+        this.galModifiedtime = updateDto.getGalModifiedTime() != null ? updateDto.getGalModifiedTime() : LocalDateTime.now();
     }
 
     @PrePersist
@@ -97,8 +82,4 @@ public class Gallery {
         }
     }
 
-    @PreUpdate
-    protected void onUpdate() {
-        this.galModifiedtime = LocalDateTime.now();
-    }
 }

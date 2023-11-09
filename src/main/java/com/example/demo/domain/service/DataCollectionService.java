@@ -1,6 +1,7 @@
 package com.example.demo.domain.service;
 
-import com.example.demo.domain.dto.Response.TourismPhotoGalleryResponseDto;
+import com.example.demo.domain.dto.GalleryUpdateDto;
+import com.example.demo.domain.dto.TourismPhotoGalleryResponseDto;
 import com.example.demo.domain.entity.Gallery;
 import com.example.demo.domain.repository.GalleryRepository;
 import com.example.demo.global.error.exception.BusinessLogicException;
@@ -8,7 +9,6 @@ import com.example.demo.global.error.exception.ExceptionCode;
 import com.example.demo.global.utils.DateTimeUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.*;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -88,20 +88,27 @@ public class DataCollectionService {
                 Gallery existingGallery = existingGalleryOptional.get();
                 LocalDateTime existingModifiedTime = existingGallery.getGalModifiedtime();
                 LocalDateTime newModifiedTime = DateTimeUtil.parseToLocalDateTime(item.getGalModifiedtime());
+
                 if (newModifiedTime.isAfter(existingModifiedTime)) {
-                    existingGallery.updateFromDto(item);
+                    GalleryUpdateDto updateDto = new GalleryUpdateDto(
+                        item.getGalContentTypeId(),
+                        item.getGalTitle(),
+                        item.getGalWebImageUrl(),
+                        item.getGalPhotographyMonth(),
+                        item.getGalPhotographyLocation(),
+                        item.getGalPhotographer(),
+                        item.getGalSearchKeyword(),
+                        newModifiedTime
+                    );
+                    existingGallery.update(updateDto);
                     galleryRepository.save(existingGallery);
                 }
             } else {
-                try {
-                    galleryRepository.save(item.toEntity());
-                } catch (DataIntegrityViolationException e) {
-                    throw new BusinessLogicException(ExceptionCode.DUPLICATE_RESOURCE, "Duplicate entry for gallery item with content ID: " + item.getGalContentId());
-                }
+                Gallery newGallery = item.toEntity();
+                galleryRepository.save(newGallery);
             }
         });
     }
-
 
     @Scheduled(cron = "0 0 0 * * *")
     public void scheduledDataCollection() {
